@@ -1,4 +1,5 @@
 import os
+import secrets
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -14,7 +15,10 @@ def create_app():
         static_folder="../static",
         template_folder="../templates"
     )
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "super-secret-key")
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or secrets.token_hex(32)
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_SECURE"] = os.getenv("FLASK_ENV") == "production"
     app.config["GOOGLE_CLIENT_ID"] = os.getenv("GOOGLE_CLIENT_ID", "")
 
     # Register blueprints

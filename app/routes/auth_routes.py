@@ -67,5 +67,10 @@ def current_user():
 
 @auth_bp.post("/auth/logout")
 def logout():
+    key_id = session.get("gemini_key_id")
+    if key_id:
+        from app.routes.chat_routes import GEMINI_KEYS
+
+        GEMINI_KEYS.pop(key_id, None)
     session.clear()
     return jsonify({"message": "Logged out"})
