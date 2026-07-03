@@ -1,0 +1,9 @@
+Flask
+SpeechRecognition
+gTTS
+pygame
+google-genai
+google-auth
+python-dotenv
+edge-tts
+supabase

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}VoiceSaathi{% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/voicesaathi-favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            colors: {
+              primary: "#e5e7eb",
+              surface: "#090909",
+              panel: "#111111",
+              muted: "#94a3b8",
+              darkbg: "#000000",
+            },
+            boxShadow: {
+              soft: "0 18px 50px rgba(0,0,0,.35)"
+            }
+          }
+        }
+      }
+    </script>
+
+    <script>
+      (function () {
+        const setAppHeight = () => {
+          const hasVisualViewport = Boolean(window.visualViewport);
+          const viewportHeight = hasVisualViewport ? window.visualViewport.height : window.innerHeight;
+          const viewportTop = hasVisualViewport ? window.visualViewport.offsetTop : 0;
+          const keyboardOffset = Math.max(0, window.innerHeight - (viewportHeight + viewportTop));
+
+          document.documentElement.style.setProperty("--app-height", `${Math.round(viewportHeight)}px`);
+          document.documentElement.style.setProperty("--kb-offset", `${Math.round(keyboardOffset)}px`);
+        };
+
+        const scheduleSetAppHeight = () => window.setTimeout(setAppHeight, 50);
+
+        setAppHeight();
+        window.addEventListener("resize", scheduleSetAppHeight);
+        window.addEventListener("orientationchange", scheduleSetAppHeight);
+        window.addEventListener("pageshow", scheduleSetAppHeight);
+        window.addEventListener("focusin", scheduleSetAppHeight);
+        window.addEventListener("focusout", scheduleSetAppHeight);
+
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", scheduleSetAppHeight);
+          window.visualViewport.addEventListener("scroll", scheduleSetAppHeight);
+        }
+      })();
+    </script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            background: #000;
+        }
+
+        .app-shell {
+            height: var(--app-height, 100vh);
+            max-height: var(--app-height, 100vh);
+            width: 100%;
+        }
+
+        .safe-bottom {
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+        }
+
+        .input-dock {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: var(--kb-offset, 0px);
+            z-index: 30;
+        }
+
+        @media (min-width: 768px) {
+            .input-dock {
+                position: static;
+            }
+        }
+
+        .glass {
+            background: rgba(8,8,8,0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148,163,184,0.12);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+
+        .message-enter {
+            animation: messageEnter .18s ease-out both;
+        }
+
+        .mic-button {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .brand-mark {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .brand-mark::before {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: 1.15rem;
+            border: 1px solid rgba(229, 231, 235, 0.12);
+            opacity: .8;
+            z-index: -1;
+        }
+
+        .brand-mark::after {
+            content: "";
+            position: absolute;
+            inset: 9px;
+            border-radius: 999px;
+            background: rgba(229, 231, 235, 0.08);
+            filter: blur(8px);
+            z-index: -2;
+        }
+
+        .mic-button::before {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border-radius: 1rem;
+            border: 1px solid rgba(229, 231, 235, 0.14);
+            opacity: 0;
+            transform: scale(.9);
+            transition: opacity .18s ease, transform .18s ease;
+            z-index: -1;
+        }
+
+        .mic-button:hover::before,
+        .mic-button.is-listening::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .mic-button.is-listening::after {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 1.25rem;
+            border: 1px solid rgba(229, 231, 235, 0.28);
+            animation: micPulse 1.25s ease-out infinite;
+            z-index: -2;
+        }
+
+        .mic-bars span {
+            display: block;
+            width: 3px;
+            border-radius: 999px;
+            background: currentColor;
+            opacity: .8;
+            animation: micBar 820ms ease-in-out infinite;
+        }
+
+        .mic-bars span:nth-child(1) { height: 9px; animation-delay: 0ms; }
+        .mic-bars span:nth-child(2) { height: 16px; animation-delay: 110ms; }
+        .mic-bars span:nth-child(3) { height: 11px; animation-delay: 220ms; }
+
+        @keyframes micPulse {
+            from { opacity: .55; transform: scale(.92); }
+            to { opacity: 0; transform: scale(1.18); }
+        }
+
+        @keyframes micBar {
+            0%, 100% { transform: scaleY(.55); }
+            50% { transform: scaleY(1); }
+        }
+
+        @keyframes messageEnter {
+            from { opacity: 0; transform: translateY(8px) scale(.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+
+<body class="bg-darkbg text-slate-100 overflow-hidden">
+    {% block content %}{% endblock %}
+</body>
+</html>
